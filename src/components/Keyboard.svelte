@@ -5,8 +5,8 @@
 
   const rows = [
     ["q", "w", "e", "r", "t", "y", "u", "i", "o", "p"],
-    ["a", "s", "d", "f", "g", "h", "j", "k", "l"],
-    ["ent", "z", "x", "c", "v", "b", "n", "m", "del"],
+    ["a", "s", "d", "f", "g", "h", "j", "k", "l", "del"],
+    ["z", "x", "c", "v", "b", "n", "m", "ent"],
   ];
 
   const colorClass = {
@@ -55,8 +55,8 @@
     justify-content: space-between;
     width: 100%;
 
-    &:nth-child(2) {
-      width: 90%;
+    &:nth-child(3) {
+      width: 86%;
     }
   }
 
@@ -64,12 +64,13 @@
     flex-grow: 1;
     margin-top: 8px;
     margin-right: 2px;
+    padding: 0;
     width: 100%;
     height: 50px;
     border: 1px solid var(--border-color);
     border-radius: 3px;
     background-color: var(--default);
-    font-size: 16px;
+    font-size: 14px;
     font-weight: bold;
     color: var(--border-color);
 

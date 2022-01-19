@@ -1,0 +1,12 @@
+/* Write your global styles here, in SCSS syntax. Variables and mixins from the src/variables.scss file are available here without importing */
+html,
+body,
+#app {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+
+  * {
+    box-sizing: border-box;
+  }
+}

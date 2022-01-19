@@ -106,26 +106,6 @@
     }
   }
 
-  $: showNewGameButton =
-    $attempts.length === 6 ||
-    (targetWord &&
-      targetWord ===
-        $attempts[$attempts.length]?.map(([letter]) => letter).join(""));
-
-  let interval;
-
-  function handleKeydown(event) {
-    if (!interval) {
-      interval = setInterval(() => {
-        $duration += 1;
-      }, 1000);
-    }
-
-    if (!event.metaKey && !showNewGameButton) {
-      return handleInput(event.key);
-    }
-  }
-
   function triggerVictory() {
     const triesNum = $attempts.length;
     const triesText = `${triesNum} tr${triesNum === 1 ? "y" : "ies"}`;
@@ -154,6 +134,30 @@
     }, 0);
   }
 
+  // Derived state for text in `startNewGame` button
+  $: showNewGameButton =
+    $attempts.length === 6 ||
+    (targetWord &&
+      targetWord ===
+        $attempts[$attempts.length]?.map(([letter]) => letter).join("")) ||
+    ($attempts.length && !interval);
+
+  // Setup timer to track duration
+  let interval;
+
+  function handleKeydown(event) {
+    if (!interval) {
+      interval = setInterval(() => {
+        $duration += 1;
+      }, 1000);
+    }
+
+    // Don't do
+    if (!event.metaKey && !showNewGameButton) {
+      return handleInput(event.key);
+    }
+  }
+
   function handleNewGame(event) {
     if (!showNewGameButton) {
       const wantsReset = window.confirm(
@@ -169,12 +173,19 @@
     event.target.blur();
   }
 
+  function disableDoubleTapZoom(event) {
+    event.preventDefault();
+    event.target.click();
+  }
+
   onMount(() => {
     document.addEventListener("keydown", handleKeydown);
+    document.addEventListener("touchend", disableDoubleTapZoom);
   });
 
   onDestroy(() => {
     document.removeEventListener("keydown", handleKeydown);
+    document.removeEventListener("touchend", disableDoubleTapZoom);
     clearInterval(interval);
   });
 </script>

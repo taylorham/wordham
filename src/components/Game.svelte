@@ -73,6 +73,8 @@
       } else if ($attempts.length === 6) {
         triggerDefeat();
       }
+    } else {
+      alert(`"${attemptWord.toUpperCase()}" is not in the game dictionary.`);
     }
   }
 
@@ -108,10 +110,7 @@
     $attempts.length === 6 ||
     (targetWord &&
       targetWord ===
-        $attempts
-          .at(-1)
-          ?.map(([letter]) => letter)
-          .join(""));
+        $attempts[$attempts.length]?.map(([letter]) => letter).join(""));
 
   let interval;
 
@@ -144,7 +143,6 @@
       );
     }, 0);
 
-    // TODO: Trigger this with a button press after victory/defeat
     updateStorage((state) => ({
       pastWords: [...state.pastWords, state.wordIndex],
     }));
@@ -155,6 +153,7 @@
       alert("Oooh, better luck next time!");
     }, 0);
   }
+
   function handleNewGame(event) {
     if (!showNewGameButton) {
       const wantsReset = window.confirm(

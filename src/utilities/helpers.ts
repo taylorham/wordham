@@ -9,20 +9,6 @@ export function numericArray(size: number) {
   return new Array(size).fill(true).map((_, i) => i);
 }
 
-export function wordToObject(word): { [key: string]: Array<number> } {
-  const object = {};
-
-  for (const [index, letter] of [...word].entries()) {
-    if (!object[letter]) {
-      object[letter] = [];
-    }
-
-    object[letter].push(index);
-  }
-
-  return object;
-}
-
 export function randomIndex(array) {
   return Math.floor(Math.random() * array.length);
 }
@@ -55,7 +41,7 @@ export function pickWord(pastWords = [], currentWordIndex = null) {
   };
 }
 
-export const defaultStorageValues = {
+const defaultStorageValues = {
   wordIndex: null,
   attempts: [],
   usedLetters: {},
@@ -84,6 +70,11 @@ export function updateStorage(updater: ((state) => Storage) | Storage) {
   window.localStorage.setItem("wordham_history", serializedState);
 }
 
+export function disableDoubleTapZoom(event) {
+  event.preventDefault();
+  event.target.click();
+}
+
 export function emojiFromAttempts(attempts: Array<Attempt>) {
   const black = "\u2b1b";
   const yellow = "\ud83d\udfe8";
@@ -101,7 +92,11 @@ export function emojiFromAttempts(attempts: Array<Attempt>) {
     attemptsAsEmoji.push(attemptAsEmoji);
   }
 
-  return attemptsAsEmoji;
+  const formattedForDisplay = attemptsAsEmoji
+    .map((row) => row.join(""))
+    .join("\n");
+
+  return formattedForDisplay;
 }
 
 export function parseDuration(duration) {

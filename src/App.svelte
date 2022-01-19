@@ -51,4 +51,19 @@
   });
 </script>
 
-<Game targetWord={word} {startNewGame} />
+<main>
+  <Game targetWord={word} {startNewGame} />
+</main>
+
+<style lang="scss">
+  main {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    width: 375px;
+    height: 100%;
+    margin: 0 auto;
+    padding: 15px;
+  }
+</style>

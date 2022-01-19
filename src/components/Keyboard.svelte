@@ -62,12 +62,16 @@
 
   button {
     flex-grow: 1;
-    background-color: var(--default);
-    border: 1px solid #333;
     margin-top: 8px;
     margin-right: 2px;
     width: 100%;
     height: 50px;
+    border: 1px solid var(--border-color);
+    border-radius: 3px;
+    background-color: var(--default);
+    font-size: 16px;
+    font-weight: bold;
+    color: var(--border-color);
 
     &:last-child {
       margin-right: 0;

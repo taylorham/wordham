@@ -7,6 +7,7 @@
     duration,
   } from "../utilities/store";
   import {
+    disableDoubleTapZoom,
     emojiFromAttempts,
     isValidWord,
     numericArray,
@@ -83,34 +84,15 @@
       if (!(letter in $usedLetters) || $usedLetters[letter] < value) {
         $usedLetters[letter] = value;
       }
-
-      $usedLetters = $usedLetters;
     }
-  }
-
-  $: currentAttemptAsArray = [...$currentAttempt].map((letter) => [letter]);
-
-  function handleInput(key) {
-    if (/^[a-zA-Z]$/.test(key)) {
-      if ($currentAttempt.length < 5) {
-        $currentAttempt += key.toLowerCase();
-      }
-    } else if (["Backspace", "del"].includes(key)) {
-      if ($currentAttempt.length > 0) {
-        $currentAttempt = $currentAttempt.slice(0, -1);
-      }
-    } else if (["Enter", "ent"].includes(key)) {
-      if ($currentAttempt.length === 5) {
-        registerAttempt($currentAttempt);
-      }
-    }
+    // Triggers state update and re-render
+    $usedLetters = $usedLetters;
   }
 
   function triggerVictory() {
     const triesNum = $attempts.length;
     const triesText = `${triesNum} tr${triesNum === 1 ? "y" : "ies"}`;
     const emoji = emojiFromAttempts($attempts);
-    const emojiText = emoji.map((row) => row.join("")).join("\n");
     const parsedDuration = parseDuration($duration);
 
     // TODO: replace alert with modal and "Copy" button
@@ -119,10 +101,11 @@
         `You did it in ${triesText}!\n\n` +
           `Tell your friends:\n\n` +
           `Wordham: ${triesNum}/6 in ${parsedDuration}\n\n` +
-          emojiText
+          emoji
       );
     }, 0);
 
+    // Add guessed word to previous words
     updateStorage((state) => ({
       pastWords: [...state.pastWords, state.wordIndex],
     }));
@@ -144,7 +127,7 @@
 
   // Setup timer to track duration
   let interval;
-
+  // Start timer on first keypress
   function handleKeydown(event) {
     if (!interval) {
       interval = setInterval(() => {
@@ -152,9 +135,22 @@
       }, 1000);
     }
 
-    // Don't do
+    // Don't do anything if the meta key or "New Game" are visible
     if (!event.metaKey && !showNewGameButton) {
       return handleInput(event.key);
+    }
+  }
+
+  function handleInput(key) {
+    if (/^[a-zA-Z]$/.test(key) && $currentAttempt.length < 5) {
+      $currentAttempt += key.toLowerCase();
+    } else if (
+      ["Backspace", "del"].includes(key) &&
+      $currentAttempt.length > 0
+    ) {
+      $currentAttempt = $currentAttempt.slice(0, -1);
+    } else if (["Enter", "ent"].includes(key) && $currentAttempt.length === 5) {
+      registerAttempt($currentAttempt);
     }
   }
 
@@ -173,10 +169,7 @@
     event.target.blur();
   }
 
-  function disableDoubleTapZoom(event) {
-    event.preventDefault();
-    event.target.click();
-  }
+  $: currentAttemptAsArray = [...$currentAttempt].map((letter) => [letter]);
 
   onMount(() => {
     document.addEventListener("keydown", handleKeydown);
@@ -190,38 +183,26 @@
   });
 </script>
 
-<main>
-  <div id="attempts">
-    {#each totalAttempts as attemptIndex}
-      <Attempt
-        isCurrent={attemptIndex === attemptNum}
-        attempt={attemptIndex === attemptNum
-          ? currentAttemptAsArray
-          : $attempts[attemptIndex]}
-      />
-    {/each}
-  </div>
-  <Keyboard {handleInput} />
-  <button
-    on:click={handleNewGame}
-    class:show={$attempts.length}
-    class:isNew={showNewGameButton}
-  >
-    {showNewGameButton ? "New Game" : "Skip Word"}
-  </button>
-</main>
+<div id="attempts">
+  {#each totalAttempts as attemptIndex}
+    <Attempt
+      isCurrent={attemptIndex === attemptNum}
+      attempt={attemptIndex === attemptNum
+        ? currentAttemptAsArray
+        : $attempts[attemptIndex]}
+    />
+  {/each}
+</div>
+<Keyboard {handleInput} />
+<button
+  on:click={handleNewGame}
+  class:show={$attempts.length}
+  class:isNew={showNewGameButton}
+>
+  {showNewGameButton ? "New Game" : "Skip Word"}
+</button>
 
 <style lang="scss">
-  main {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    align-items: center;
-    width: 375px;
-    height: 100%;
-    margin: 0 auto;
-  }
-
   #attempts {
     width: 100%;
   }
@@ -232,6 +213,9 @@
     height: 60px;
     margin: 15px auto;
     background-color: var(--include);
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    color: var(--border-color);
     font-size: 20px;
     transition: 400ms;
 

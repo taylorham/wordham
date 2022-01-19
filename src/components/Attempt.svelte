@@ -28,7 +28,7 @@
     display: flex;
     justify-content: space-between;
     width: 100%;
-    margin: 10px 0;
+    margin-bottom: 10px;
   }
 
   .attempt-letter {
